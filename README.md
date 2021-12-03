@@ -2,8 +2,9 @@
 
 ## Szenario
 
-In diesem stark vereinfachten Szenario gibt es einen **MesswertService**, 
-der `Messwert`-Objekte empfängt und `Bewertung`-Objekte an die aufrufende Komponente zurückschickt.
+In diesem stark vereinfachten Szenario gibt es einen **MesswertService**, der beispielhaft zwei Anwendungsfälle abdecken soll:
+1. Ein einfaches **Speichern** einzelner `Messwert`-Objekte auf Serverseite 
+2. Eine komplexere **Überwachung** von `Messwert`-Objekte, die `Bewertung`-Objekte an die aufrufende Komponente zurückschickt
 
 Diese generelle Liefer- und Leistungsbeziehung beschreibt folgende Skizze:
 
@@ -30,13 +31,13 @@ Implementieren Sie diese Art der Kommunikation mit beiden Möglichkeiten auf der
 Beispiele für die versendeten Daten:
 
 ```scala
-Messwert("Wasserstand Schleuse Regensburg", 9.40)  // Übergabeparameter
-Bewertung("Schleuse um 1 m öffnen")
+Messwert("Wasserstand Schleuse Regensburg", 9.40)                // mögliches Übergabeargument und/oder ...
+Bewertung("Schleuse um 1 m öffnen", "2021-12-01 04:18:53")  // ... Rückgabeargument
 ```
 
 ### Möglichkeit 2: Callbacks/Streaming auch für den Übergabeparametertypen
 
-Stellen Sie sich folgendes Szenario vor:
+Stellen Sie sich folgendes Szenario für den Anwendungsfall der **Überwachung** vor:
 Sobald der Aufrufer die Servicemethode aufgerufen hat, ist es möglich, dass beliebig `Messwert`-Objekte übergeben
 und (unabhängig davon) beliebig `Bewertung`-Objekte zurückgeschickt werden.
 
@@ -44,12 +45,12 @@ Beispiel:
 
 ```scala
 // nach Serviceaufruf:
-Messwert("Wasserstand Schleuse Regensburg", 6.25)   // --> an Service
-Messwert("Wasserstand Schleuse Regensburg", 7.90)   // --> an Service, aber etwas später
-Messwert("Wasserstand Schleuse Regensburg", 9.40)   // --> an Service, wieder etwas später
-Bewertung("Schleuse um 1 m öffnen")                 // <-- von Service
-Messwert("Wasserstand Schleuse Regensburg", 9.90)   // --> an Service, wieder etwas später
-Bewertung("Schleuse um 2 m öffnen")                 // <-- von Service, erneut etwas zurückgeschickt
+Messwert("Wasserstand Schleuse Regensburg", 6.25)           // --> an Service
+Messwert("Wasserstand Schleuse Regensburg", 7.90)           // --> an Service, aber etwas später
+Messwert("Wasserstand Schleuse Regensburg", 9.40)           // --> an Service, wieder etwas später
+Bewertung("Schleuse um 1 m öffnen", "2021-12-01 04:18:53")  // <-- von Service
+Messwert("Wasserstand Schleuse Regensburg", 9.90)           // --> an Service, wieder etwas später
+Bewertung("Schleuse um 2 m öffnen", "2021-12-01 06:59:20")  // <-- von Service, erneut etwas zurückgeschickt
 ```
 
 Dies ist möglich, indem sowohl der Über- als auch der Rückgabeparameter als `stream` gekennzeichnet werden.
